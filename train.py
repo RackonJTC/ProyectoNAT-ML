@@ -1,5 +1,6 @@
 import sys
 import os
+# os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 # from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras import optimizers
@@ -18,18 +19,17 @@ data_validacion = './data/validacion'
 """
 Parameters
 """
-epocas = 50
+epocas = 20
 longitud, altura = 150, 150
-batch_size = 2 #32
-pasos = 6944 #1000
-validation_steps = 200
+batch_size = 100 #32
+batch_size_validation = 300 #32
 filtrosConv1 = 32
 filtrosConv2 = 64
 tamano_filtro1 = (3, 3)
 tamano_filtro2 = (2, 2)
 tamano_pool = (2, 2)
 clases = 224
-lr = 0.0004 #Cada paso, lo que intenta mejor la inteligencia
+lr = 0.0004 #Cada paso, lo que intenta mejorar la inteligencia
 
 ##Preparamos nuestras imagenes
 
@@ -38,7 +38,6 @@ entrenamiento_datagen = ImageDataGenerator(
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True)
-
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 entrenamiento_generador = entrenamiento_datagen.flow_from_directory(
@@ -52,6 +51,7 @@ validacion_generador = test_datagen.flow_from_directory(
     target_size=(altura, longitud),
     batch_size=batch_size,
     class_mode='categorical')
+print(entrenamiento_generador.class_indices)
 
 cnn = Sequential()
 cnn.add(
@@ -72,10 +72,11 @@ cnn.compile(loss='categorical_crossentropy',
 
 cnn.fit_generator(
     entrenamiento_generador,
-    steps_per_epoch=pasos,
+    # entrenamiento da la cantidad de imagenes y al dividirlo por batch_size da el numero de pasos por epoca
+    steps_per_epoch=entrenamiento_generador.n/batch_size,
     epochs=epocas,
     validation_data=validacion_generador,
-    validation_steps=validation_steps)
+    validation_steps=validacion_generador.n/batch_size_validation)
 
 print(entrenamiento_generador.class_indices)
 

@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from keras.preprocessing.image import load_img, img_to_array
 from keras.models import load_model
 
@@ -15,15 +16,10 @@ def predict(file):
   array = cnn.predict(x)
   result = array[0]
   answer = np.argmax(result)
-  print(array)
-  if answer == 0:
-    print("pred: Alianzas")
-  elif answer == 1:
-    print("pred: Arbol")
-  elif answer == 2:
-    print("pred: Paloma cruz")
-  elif answer == 3:
-    print("pred: Virgen")
-  return answer
+  # print(array)
+  contenido = os.listdir('./data/entrenamiento')
+  print(contenido)
+  print(contenido[answer])
+  # print(answer)
 
-predict("data/prueba/virgen.png")
+predict("data/validacion/09 ARBOL/09 ARBOLCent1.jpg")
